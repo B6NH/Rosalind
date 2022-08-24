@@ -63,7 +63,7 @@ proc FIB {} {
   for {set i 2} {$i < $n} {incr i} {
     set f1 [lindex $lst [expr {$i - 1}]]
     set f2 [lindex $lst [expr {$i - 2}]]
-    lappend lst [expr {$f1 + $f2 * 3}]
+    lappend lst [expr {$f1 + $f2 * $k}]
   }
 
   puts $lst
@@ -74,16 +74,24 @@ proc FIB {} {
 
 proc GC {} {
 
-  set f [open "gc.fasta" r]
-  set lines [split [read $f] \n]
-  close $f
-
-  set le [expr {[llength $lines] - 1}]
-  set lines [lreplace $lines $le $le]
+  set lines [readLines "gc.fasta"]
 
   gcsAndLengths $lines gcs lengths
   set rslt [maxPercentageGC gcs lengths]
   puts "[lindex $rslt 0]\n[lindex $rslt 1]"
+
+}
+
+proc readLines {fname} {
+
+  # Read data
+  set f [open $fname r]
+  set lines [split [read $f] \n]
+  close $f
+
+  # Remove empty line
+  set le [expr {[llength $lines] - 1}]
+  return [lreplace $lines $le $le]
 
 }
 
@@ -172,12 +180,7 @@ proc IPRB {} {
   set tot1 [expr {$tot - 1}]
 
   # Pairs and their probabilities
-  set pairs {}
-  for {set i 0} {$i < $types} {incr i} {
-    for {set j $i} {$j < $types} {incr j} {
-      lappend pairs "{$i $j} [probDom $i $j]"
-    }
-  }
+  set pairs [calPairs $types]
 
   set pro 0
   for {set i 0} {$i < $types} {incr i} {
@@ -198,6 +201,19 @@ proc IPRB {} {
 
   # Sum of probabilities
   puts $pro
+
+}
+
+proc calPairs {types} {
+
+  set pairs {}
+  for {set i 0} {$i < $types} {incr i} {
+    for {set j $i} {$j < $types} {incr j} {
+      lappend pairs "{$i $j} [probDom $i $j]"
+    }
+  }
+
+  return $pairs
 
 }
 
@@ -291,21 +307,13 @@ ATAT"
 
 proc CONS {} {
 
-  # Read data
-  set f [open "cons.fasta" r]
-  set lines [split [read $f] \n]
-  close $f
-
-  # Remove empty line
-  set le [expr {[llength $lines] - 1}]
-  set lines [lreplace $lines $le $le]
-  unset le
+  set lines [readLines "cons.fasta"]
 
   # Collect strings
   set dnaStrings {} ; set currentDna ""
   foreach line $lines {
-    if {[string index $line 0] == ">"} {
-      if {$currentDna != {}} {
+    if {">" == [string index $line 0]} {
+      if {"" != $currentDna} {
         lappend dnaStrings $currentDna
         set currentDna ""
       }
@@ -383,6 +391,83 @@ proc calFreqs {dnaStrings} {
 # -------------------------------------------------------------------
 
 proc FIBD {} {
+
+  set lst {1 1} ; set n 10 ; set m 3
+
+  for {set i 2} {$i < $n} {incr i} {
+
+    set ind1 [expr {$m > $i ? 0 : $i - $m}]
+    set ind2 [expr {$ind1 + 1}]
+
+    set fc [lindex $lst $ind2]
+    set ff [lindex $lst $ind1]
+
+    lappend lst [expr {$fc + $ff}]
+
+  }
+
+  puts $lst
+
+}
+
+# -------------------------------------------------------------------
+
+proc GRPH {} {
+
+  set lines [readLines "grph.fasta"]
+
+  set cKey "" ; set cStr ""
+  foreach l $lines {
+
+    if {">" == [string index $l 0]} {
+
+      if {"" != $cStr} { set arr($cKey) $cStr ; set cStr "" }
+      set cKey [string range $l 1 end]
+
+    } else {
+      set cStr $cStr$l
+    }
+  }
+
+  set arr($cKey) $cStr ; unset cStr l
+
+  # O3
+  set k 3
+  set keys [array names arr]
+
+  foreach i $keys {
+    foreach j $keys {
+      if {$i != $j &&\
+          [string range $arr($i) [expr {[string length $arr($i)] - $k}] end] ==\
+          [string range $arr($j) 0 [expr {$k - 1}]]} {
+        puts "$i $j"
+      }
+    }
+  }
+
+}
+
+# -------------------------------------------------------------------
+
+proc IEV {} {
+
+  set input {1 0 0 1 0 1}
+  set le [llength $input]
+  set off 2 ; set prbs [calPairs 3]
+
+  set s 0
+  for {set i 0} {$i < $le} {incr i} {
+    set s [expr {$s + [lindex $input $i] *\
+                      [lindex $prbs $i 1]}]
+  }
+
+  puts [expr {$s * $off}]
+
+}
+
+# -------------------------------------------------------------------
+
+proc LCSM {} {
 }
 
 # -------------------------------------------------------------------
@@ -397,7 +482,10 @@ proc FIBD {} {
 #PROT
 #SUBS
 #CONS
-FIBD
+#FIBD
+#GRPH
+#IEV
+LCSM
 
 # -------------------------------------------------------------------
 
