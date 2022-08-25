@@ -310,19 +310,7 @@ proc CONS {} {
   set lines [readLines "cons.fasta"]
 
   # Collect strings
-  set dnaStrings {} ; set currentDna ""
-  foreach line $lines {
-    if {">" == [string index $line 0]} {
-      if {"" != $currentDna} {
-        lappend dnaStrings $currentDna
-        set currentDna ""
-      }
-    } else {
-      set currentDna $currentDna$line
-    }
-  }
-
-  lappend dnaStrings $currentDna ; unset currentDna
+  set dnaStrings [colStrings $lines]
 
   # Display consensus string and profile matrix
   conStringMatrix [calFreqs $dnaStrings]
@@ -385,6 +373,26 @@ proc calFreqs {dnaStrings} {
   }
 
   return $frequencies
+
+}
+
+proc colStrings {lines} {
+
+  set dnaStrings {} ; set currentDna ""
+  foreach line $lines {
+    if {">" == [string index $line 0]} {
+      if {"" != $currentDna} {
+        lappend dnaStrings $currentDna
+        set currentDna ""
+      }
+    } else {
+      set currentDna $currentDna$line
+    }
+  }
+
+  lappend dnaStrings $currentDna
+
+  return $dnaStrings
 
 }
 
@@ -468,6 +476,127 @@ proc IEV {} {
 # -------------------------------------------------------------------
 
 proc LCSM {} {
+
+  set strings [colStrings [readLines "lcsm.fasta"]]
+  puts [fCom $strings]
+
+}
+
+proc fCom {strings} {
+
+  # Find length of shortest string
+  set le [llength $strings]
+  set shrt [string length [lindex $strings 0]]
+  for {set i 1} {$i < $le} {incr i} {
+    set l [string length [lindex $strings $i]]
+    if {$l < $shrt} { set shrt $l }
+  }
+
+  # First string
+  set fString [lindex $strings 0]
+  set fLen [string length $fString]
+
+  # Try different substring lengths
+  # Start with max possible size
+  for {set subLen $shrt} {$subLen > 0} {incr subLen -1} {
+
+    # Shift window
+    for {set j 0} {$j <= $fLen - $subLen} {incr j} {
+
+      # Candidate
+      set cand [fSubH $fString $j $subLen]
+
+      # Search candidate in other strings
+      set s 1
+      for {set k 1} {$k < $le} {incr k} {
+
+        # Check if string contains candidate
+        if {-1 == [string first $cand [lindex $strings $k]]} {
+          set s 0; break
+        }
+
+      }
+
+      if {$s} { return $cand }
+
+    }
+
+  }
+
+}
+
+proc fSubH {str start len} {
+  return [string range $str $start [expr {$start + $len - 1}]]
+}
+
+# -------------------------------------------------------------------
+
+proc LIA {} {
+
+  set k 2 ; set n 1 ; set tom {S s B b}
+
+  set gn [calOff 2 $tom $tom $tom]
+  set gnLen [llength $gn]
+
+  set tot 0
+  foreach o $gn {
+    if {$o == $tom} { incr tot }
+  }
+
+  puts $tot
+  puts $gnLen
+  puts [expr {double($tot) / $gnLen}]
+
+}
+
+proc calP {org} {
+
+  set p {}
+  for {set i 0} {$i < 2} {incr i} {
+    for {set j 2} {$j < 4} {incr j} {
+      lappend p "[lindex $org $i] [lindex $org $j]"
+    }
+  }
+
+  return $p
+
+}
+
+proc calG {level p1 p2} {
+
+  set s 4 ; set gn {}
+
+  for {set i 0} {$i < $s} {incr i} {
+    for {set j 0} {$j < $s} {incr j} {
+
+      set organism "[lindex $p1 $i 0] [lindex $p2 $j 0]\
+                    [lindex $p1 $i 1] [lindex $p2 $j 1]"
+
+      lappend gn $organism
+
+    }
+  }
+
+  return $gn
+
+}
+
+proc calOff {level org1 org2 tom} {
+
+  set p1 [calP $org1]
+  set p2 [calP $org2]
+  set off [calG $level $p1 $p2]
+
+  if {1 == $level} {
+    return $off
+  } else {
+    set result {}
+    foreach o $off {
+      set result [concat $result [calOff [expr {$level - 1}] $tom $o $tom]]
+    }
+    return $result
+  }
+
 }
 
 # -------------------------------------------------------------------
@@ -482,10 +611,11 @@ proc LCSM {} {
 #PROT
 #SUBS
 #CONS
-#FIBD
+#FIBD ?
 #GRPH
 #IEV
-LCSM
+#LCSM
+#LIA ?
 
 # -------------------------------------------------------------------
 
