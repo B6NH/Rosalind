@@ -602,6 +602,137 @@ proc calOff {level org1 org2 tom} {
 
 # -------------------------------------------------------------------
 
+proc PRTM {} {
+
+  set input SKADYEK
+  set masses [readLines "mono_mass.txt"]
+
+  set sum 0
+  set length [string length $input]
+  for {set i 0} {$i < $length} {incr i} {
+    set symbol [string index $input $i]
+    set sum [expr {$sum + [massOf $symbol $masses]}]
+  }
+
+  puts $sum
+
+}
+
+proc massOf {s masses} {
+  foreach m $masses {
+    if {[lindex $m 0] == $s} {
+      return [lindex $m 1]
+    }
+  }
+}
+
+# -------------------------------------------------------------------
+
+proc MRNA {} {
+
+  set input MA ; set knownAA {} ; set m 1000000
+
+  set f [open "rna_codon.txt" r]
+  set codons [regexp -all -inline {\S+} [read $f]]
+  close $f
+
+  # Stop codons
+  set tot 3
+  set length [string length $input]
+  for {set i 0} {$i < $length} {incr i} {
+
+    set s [string index $input $i]
+    set nc [findCod $s $knownAA]
+
+    if {$nc} {
+      set tot [mul $tot $nc $m]
+    } else {
+      set new [numCod $s $codons]
+      set tot [mul $tot $new $m]
+      lappend knownAA "$s $new"
+    }
+
+  }
+
+  puts $tot
+
+}
+
+proc numCod {c codons} {
+
+  set sum 0 ; set le [llength $codons]
+  for {set i 1} {$i < $le} {incr i 2} {
+    if {[lindex $codons $i] == $c} {
+      incr sum
+    }
+  }
+
+  return $sum
+
+}
+
+proc findCod {a knownAA} {
+  foreach v $knownAA {
+    if {[lindex $v 0] == $a} {
+      return [lindex $v 1]
+    }
+  }
+  return 0
+}
+
+proc mul {tot n m} {
+  set tot [expr {$tot * $n % $m}]
+}
+
+# -------------------------------------------------------------------
+
+proc PERM {} {
+
+  set input 3 ; set elements {}
+
+  # Create list of elements
+  for {set i 1} {$i <= $input} {incr i} {
+    lappend elements $i
+  }
+
+  # Generate permutations
+  set pms [perms $elements]
+  puts [llength $pms]
+
+  # Display results
+  foreach p $pms { puts $p }
+
+}
+
+proc perms {elements} {
+
+  set len [llength $elements]
+
+  if {1 == $len} {
+    return $elements
+  } else {
+
+    set pms {}
+    for {set i 0} {$i < $len} {incr i} {
+
+      set el [lindex $elements $i]
+
+      # Permutations of elements without el
+      set ps [perms [lreplace $elements $i $i]]
+
+      # All permutations with el as first element
+      foreach p $ps { lappend pms "$el $p" }
+
+    }
+
+    return $pms
+
+  }
+
+}
+
+# -------------------------------------------------------------------
+
 #DNA
 #RNA
 #REVC
@@ -617,6 +748,9 @@ proc calOff {level org1 org2 tom} {
 #IEV
 #LCSM
 #LIA ?
+#PRTM
+#MRNA
+PERM
 
 # -------------------------------------------------------------------
 
