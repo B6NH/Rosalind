@@ -6,15 +6,15 @@ proc DNA {} {
 
   set input AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC
 
-  set a 0 ; set g 0
-  set c 0 ; set t 0
+  set A 0 ; set G 0
+  set C 0 ; set T 0
 
   set length [string length $input]
   for {set i 0} {$i < $length} {incr i} {
-    incr [string tolower [string index $input $i]]
+    incr [string index $input $i]
   }
 
-  puts "$a $c $g $t"
+  puts "$A $C $G $T"
 
 }
 
@@ -61,12 +61,13 @@ proc FIB {} {
   set lst {1 1} ; set n 5 ;  set k 3
 
   for {set i 2} {$i < $n} {incr i} {
-    set f1 [lindex $lst [expr {$i - 1}]]
-    set f2 [lindex $lst [expr {$i - 2}]]
-    lappend lst [expr {$f1 + $f2 * $k}]
+    set f2 [lindex $lst 0] ; set f1 [lindex $lst 1]
+    set new [expr {$f1 + $f2 * $k}]
+    lset lst 0 $f1
+    lset lst 1 $new
   }
 
-  puts $lst
+  puts $new
 
 }
 
@@ -217,7 +218,7 @@ proc calPairs {types} {
 
 }
 
-# Calculate probability for pair.
+# Calculate probability for pair
 proc probDom {i1 i2} {
 
   set alleles {YY Yy yy}
