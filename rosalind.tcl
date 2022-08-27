@@ -40,17 +40,24 @@ proc REVC {} {
 
   set input AAAACCCGGT
 
-  set rv [string reverse $input]
+  # Display reverse complement
+  puts [revcH $input]
+
+}
+
+proc revcH {str} {
+
+  set rv [string reverse $str]
 
   set comp(A) T ; set comp(T) A
   set comp(G) C ; set comp(C) G
 
   set length [string length $rv]
   for {set i 0} {$i < $length} {incr i} {
-    puts -nonewline $comp([string index $rv $i])
+    set rv [string replace $rv $i $i $comp([string index $rv $i])]
   }
 
-  puts ""
+  return $rv
 
 }
 
@@ -733,6 +740,81 @@ proc perms {elements} {
 
 # -------------------------------------------------------------------
 
+proc ORF {} {
+
+  # Codon table
+  set f [open "dna_codon.txt" r]
+  set codons [regexp -all -inline {\S+} [read $f]]
+  close $f
+
+  # Input string
+  set str [colStrings [readLines "orf.fasta"]]
+
+  # Initialize database
+  set database {}
+
+  # Proteins from original string
+  proteins [allPos ATG $str] $str $codons
+
+  # Proteins from reverse complement
+  set rev [revcH $str]
+  proteins [allPos ATG $rev] $rev $codons
+
+  # Display results
+  foreach d $database { puts $d }
+
+}
+
+# Find all positions of substring
+proc allPos {sub str} {
+  set positions {} ; set pos 0
+  while {-1 != [set pos [string first $sub $str $pos]]} {
+    lappend positions $pos ; incr pos
+  }
+  return $positions
+}
+
+proc proteins {starts str codons} {
+
+  upvar database db
+
+  foreach index $starts {
+
+    # ATG
+    set aminoAcid [faa $str $index $codons]
+
+    set cand ""
+    while {"Stop" != $aminoAcid && "" != $aminoAcid} {
+
+      # Add next amino acid to candidate string
+      set cand $cand$aminoAcid
+      incr index 3
+
+      # Find next amino acid
+      set aminoAcid [faa $str $index $codons]
+
+    }
+
+    # Add new protein string to database
+    if {"Stop" == $aminoAcid &&
+        -1 == [lsearch $db $cand]} {
+      lappend db $cand
+    }
+
+  }
+
+}
+
+proc faa {str index codons} {
+  return [findAminoAcid [sub3 $str $index] $codons]
+}
+
+proc sub3 {str index} {
+  return [string range $str $index [expr {$index + 2}]]
+}
+
+# -------------------------------------------------------------------
+
 #DNA
 #RNA
 #REVC
@@ -750,7 +832,8 @@ proc perms {elements} {
 #LIA ?
 #PRTM
 #MRNA
-PERM
+#PERM
+ORF
 
 # -------------------------------------------------------------------
 
