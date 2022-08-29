@@ -408,21 +408,46 @@ proc colStrings {lines} {
 
 proc FIBD {} {
 
-  set lst {1 1} ; set n 10 ; set m 3
+  set sTime 6
+  set maxMonths 3
+  set m1 [expr {$maxMonths - 1}]
 
-  for {set i 2} {$i < $n} {incr i} {
+  # List of rabbits of various ages
+  set monthsLeft {}
+  for {set i 0} {$i < $m1} {incr i} {
+    lappend monthsLeft 0
+  }
 
-    set ind1 [expr {$m > $i ? 0 : $i - $m}]
-    set ind2 [expr {$ind1 + 1}]
+  # Start with 1 rabbit at maximum age
+  lappend monthsLeft 1
 
-    set fc [lindex $lst $ind2]
-    set ff [lindex $lst $ind1]
+  # Months
+  for {set i 1} {$i < $sTime} {incr i} {
 
-    lappend lst [expr {$fc + $ff}]
+    set new 0
+    for {set j 0} {$j < $m1} {incr j} {
+
+      # Create new rabbits
+      incr new [lindex $monthsLeft $j]
+
+      # Update age
+      lset monthsLeft $j [lindex $monthsLeft [expr {$j + 1}]]
+
+    }
+
+    # Set new rabbits
+    lset monthsLeft $m1 $new
 
   }
 
-  puts $lst
+  # Sum rabbits
+  set sum 0
+  for {set i 0} {$i < $maxMonths} {incr i} {
+    incr sum [lindex $monthsLeft $i]
+  }
+
+  # Result
+  puts $sum
 
 }
 
@@ -815,6 +840,92 @@ proc sub3 {str index} {
 
 # -------------------------------------------------------------------
 
+proc MPRT {} {
+
+  # Motif: "N{P}\[ST\]{P}"
+
+  set ids [readLines "mprt_ids.txt"]
+
+  foreach id $ids {
+
+    # Save original identifier
+    set orgId $id
+
+    # Identifier before "_"
+    set pos [string first "_" $id]
+    if {-1 != $pos} {
+      set id [string range $id 0 [expr {$pos - 1}]]
+    }
+
+    # Download data
+    set pg [getPage "http://rest.uniprot.org/uniprotkb/$id.fasta"]
+
+    # Find motif positions in string
+    set positions [findMotif [colStrings [split $pg \n]]]
+
+    # Display original protein names and motif positions
+    if {{} != $positions} {
+      puts $orgId ; puts $positions
+    }
+
+  }
+
+}
+
+proc findMotif {str} {
+
+  set motifLength 4
+  set positions {}
+  set maxI [expr {[string length $str] - $motifLength}]
+
+  # All substrings
+  for {set i 0} {$i <= $maxI} {incr i} {
+
+    # Substring
+    set s [string range $str $i [expr {$i + $motifLength - 1}]]
+
+    # Letters
+    set s1 [string index $s 0] ; set s2 [string index $s 1]
+    set s3 [string index $s 2] ; set s4 [string index $s 3]
+
+    # Test
+    if {"N" == $s1 && "P" != $s2 && ("S" == $s3 || "T" == $s3) && "P" != $s4} {
+      lappend positions [expr {$i + 1}]
+    }
+
+  }
+
+  return $positions
+
+}
+
+
+proc getPage { url } {
+
+  package require http
+
+  set token [::http::geturl $url]
+
+  set code [lindex [::http::code $token] 1]
+
+  upvar #0 $token state
+  array set mt $state(meta)
+  
+  if {303 == $code} {
+    set h "http://rest.uniprot.org"
+    set newUrl $h$mt(Location)
+    ::http::cleanup $token
+    set token [::http::geturl $newUrl]
+  }
+
+  set data [::http::data $token]
+  ::http::cleanup $token
+  return $data
+
+}
+
+# -------------------------------------------------------------------
+
 #DNA
 #RNA
 #REVC
@@ -825,7 +936,7 @@ proc sub3 {str index} {
 #PROT
 #SUBS
 #CONS
-#FIBD ?
+#FIBD
 #GRPH
 #IEV
 #LCSM
@@ -833,7 +944,8 @@ proc sub3 {str index} {
 #PRTM
 #MRNA
 #PERM
-ORF
+#ORF
+MPRT
 
 # -------------------------------------------------------------------
 
