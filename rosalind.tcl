@@ -265,9 +265,7 @@ proc PROT {} {
 
   set input AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA
 
-  set f [open "rna_codon.txt" r]
-  set codons [regexp -all -inline {\S+} [read $f]]
-  close $f
+  set codons [readRnaCodons]
 
   set le [string length $input]
   for {set i 0} {$i < $le} {incr i 3} {
@@ -278,6 +276,13 @@ proc PROT {} {
 
   puts ""
 
+}
+
+proc readRnaCodons {} {
+  set f [open "rna_codon.txt" r]
+  set codons [regexp -all -inline {\S+} [read $f]]
+  close $f
+  return $codons
 }
 
 proc findAminoAcid {codon table} {
@@ -664,9 +669,7 @@ proc MRNA {} {
 
   set input MA ; set knownAA {} ; set m 1000000
 
-  set f [open "rna_codon.txt" r]
-  set codons [regexp -all -inline {\S+} [read $f]]
-  close $f
+  set codons [readRnaCodons]
 
   # Stop codons
   set tot 3
@@ -926,6 +929,52 @@ proc getPage { url } {
 
 # -------------------------------------------------------------------
 
+proc SPLC {} {
+
+  # Codon table
+  set codons [readRnaCodons]
+
+  # Read data
+  set strings [colStrings [readLines "splc.fasta"]]
+
+  # Main string
+  set main [lindex $strings 0]
+
+  # Delete introns
+  set le [llength $strings]
+  for {set i 1} {$i < $le} {incr i} {
+
+    set intron [lindex $strings $i]
+
+    set pos [string first $intron $main]
+    set main [string replace $main $pos [expr {$pos + [string length $intron] - 1}]]
+
+  }
+
+  # Transcription
+  set mLen [string length $main]
+  for {set i 0} {$i < $mLen} {incr i} {
+    if {"T" == [string index $main $i]} {
+      set main [string replace $main $i $i "U"]
+    }
+  }
+
+  # Translation
+  for {set i 0} {$i < $mLen} {incr i 3} {
+
+    set codon [string range $main $i [expr {$i + 2}]]
+    set aa [findAminoAcid $codon $codons]
+
+    if {"Stop" != $aa} { puts -nonewline $aa }
+
+  }
+
+  puts ""
+
+}
+
+# -------------------------------------------------------------------
+
 #DNA
 #RNA
 #REVC
@@ -945,7 +994,8 @@ proc getPage { url } {
 #MRNA
 #PERM
 #ORF
-MPRT
+#MPRT
+SPLC
 
 # -------------------------------------------------------------------
 
