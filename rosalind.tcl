@@ -975,6 +975,69 @@ proc SPLC {} {
 
 # -------------------------------------------------------------------
 
+proc PROB {} {
+
+  set str ACGATACAA
+  set gc {0.129 0.287 0.423 0.476 0.641 0.742 0.783}
+
+  set strLen [string length $str]
+
+  foreach c $gc {
+
+    set probGorC [expr {$c / 2}]
+    set probAorT [expr {(1 - $c) / 2}]
+
+    set v 1
+    for {set i 0} {$i < $strLen} {incr i} {
+      set s [string index $str $i]
+      set v [expr {$v * ("G" == $s || "C" == $s ? $probGorC : $probAorT)}]
+    }
+
+    puts -nonewline "[expr {log($v) / log(10)}] "
+
+  }
+
+  puts ""
+
+}
+
+# -------------------------------------------------------------------
+
+proc TRAN {} {
+
+  set strs [colStrings [readLines "tran.fasta"]]
+
+  set a [lindex $strs 0]
+  set b [lindex $strs 1]
+
+  set len [string length $a]
+
+  set transitions 0
+  set transversions 0
+
+  # Transitions
+  set trns(A) G ; set trns(G) A
+  set trns(C) T ; set trns(T) C
+
+  for {set i 0} {$i < $len} {incr i} {
+
+    set sA [string index $a $i]
+    set sB [string index $b $i]
+
+    if {$trns($sA) == $sB} {
+      incr transitions
+    } elseif {$sA != $sB} {
+      incr transversions
+    }
+
+  }
+
+  puts [expr {double($transitions) / $transversions}]
+
+}
+
+# -------------------------------------------------------------------
+
 #DNA
 #RNA
 #REVC
@@ -995,7 +1058,9 @@ proc SPLC {} {
 #PERM
 #ORF
 #MPRT
-SPLC
+#SPLC
+#PROB
+TRAN
 
 # -------------------------------------------------------------------
 

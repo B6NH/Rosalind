@@ -1,0 +1,94 @@
+
+# -------------------------------------------------------------------
+
+procedure FIBO()
+
+  input := 6
+
+  arr := [0, 1] ; input +:= 1
+
+  if 3 > input then
+
+    write(arr[input])
+
+  else {
+
+    every 3 to input do {
+      nxt := arr[1] + arr[2]
+      arr[1] := arr[2]
+      arr[2] := nxt
+    }
+
+    write(arr[2])
+
+  }
+
+end
+
+# -------------------------------------------------------------------
+
+procedure BINS()
+
+  # Read input
+  f := open("bins.txt","r")
+  n := integer(read(f)) ; m := integer(read(f))
+  sorted := lineToInts(read(f))
+  ints := lineToInts(read(f))
+  close(f)
+
+  every i := 1 to m do
+    writes(binS(ints[i], sorted, n), " ")
+  write()
+
+end
+
+procedure binS(el, lst, maxI)
+
+  minI := 1
+
+  if el < lst[minI] | el > lst[maxI] then {
+    return -1
+  } else {
+
+    while minI <= maxI do {
+
+      midI := minI + (maxI - minI) / 2
+
+      if el = lst[midI] then {
+        return midI
+      } else if el < lst[midI] then {
+        maxI := midI - 1
+      } else {
+        minI := midI + 1
+      }
+
+    }
+
+    return -1
+
+  }
+
+end
+
+procedure lineToInts(line)
+
+  ints := [] ; s := &digits ++ '-'
+
+  line ?
+    while tab(upto(s)) do
+      put(ints,integer(tab(many(s))))
+
+  return ints
+
+end
+
+# -------------------------------------------------------------------
+
+procedure main()
+
+  #FIBO()
+  BINS()
+
+end
+
+# -------------------------------------------------------------------
