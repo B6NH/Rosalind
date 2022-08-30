@@ -36,8 +36,7 @@ procedure BINS()
   ints := lineToInts(read(f))
   close(f)
 
-  every i := 1 to m do
-    writes(binS(ints[i], sorted, n), " ")
+  every writes(binS(ints[1 to m], sorted, n), " ")
   write()
 
 end
@@ -84,10 +83,46 @@ end
 
 # -------------------------------------------------------------------
 
+procedure DEG()
+
+  f := open("deg.txt","r")
+
+  # Vertices and edges
+  ves := lineToInts(read(f))
+
+  # Collect edges
+  edges := []
+  while push(edges,lineToInts(read(f)))
+
+  close(f)
+
+  # Initialize array for all vertices
+  t := table()
+  every t[1 to ves[1]] := 0
+
+  # Count occurrences
+  every t[(!edges)[1 to 2]] +:= 1
+
+  # Display result
+  every writes(t[1 to ves[1]]," ")
+
+  write()
+
+end
+
+# -------------------------------------------------------------------
+
+procedure INS()
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
-  BINS()
+  #BINS()
+  #DEG()
+  INS()
 
 end
 
