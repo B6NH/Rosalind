@@ -324,6 +324,61 @@ end
 
 # -------------------------------------------------------------------
 
+procedure BFS()
+
+  # Read data
+  f := open("bfs.txt","r")
+  fst := lineToInts(read(f))
+  n := fst[1]
+  edges := []
+  while put(edges,lineToInts(read(f)))
+  close(f)
+
+  # Table with lists of next vertices
+  outs := table()
+  every outs[1 to n] := []
+  every e := !edges do push(outs[e[1]],e[2])
+
+  # Start with 0 distance at vertex 1
+  cDistance := 0 ; vertices := [1]
+
+  # Initialize table of distances
+  distances := table()
+
+  # Loop until there are no more unknown vertices
+  while not(allKnown(vertices,distances)) do {
+
+    # Set distance for new vertices
+    every /distances[!vertices] := cDistance
+
+    # Collect next vertices in set
+    newVertices := set()
+    every insert(newVertices,!outs[!vertices])
+
+    # Update vertices
+    vertices := newVertices
+
+    # Increase distance
+    cDistance +:= 1
+
+  }
+
+  # Result
+  every i := 1 to n do
+    writes(\distances[i] | -1," ")
+
+  write()
+
+end
+
+procedure allKnown(vertices,distances)
+  every v := !vertices do
+    member(distances,v) | fail
+  return 1
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
@@ -334,7 +389,8 @@ procedure main()
   #MAJ()
   #MER()
   #MS()
-  SUM2()
+  #SUM2()
+  BFS()
 
 end
 
