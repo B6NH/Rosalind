@@ -210,6 +210,120 @@ end
 
 # -------------------------------------------------------------------
 
+procedure MER()
+
+  f := open("mer.txt", "r")
+  n := lineToInts(read(f))[1]
+  a := lineToInts(read(f))
+  m := lineToInts(read(f))[1]
+  b := lineToInts(read(f))
+  close(f)
+
+  arr := merge(a, b, n, m)
+
+  # Sorted array
+  every writes(!arr, " ")
+  write()
+
+end
+
+procedure merge(a, b, n, m)
+
+   # Total length
+  tLen := n + m
+
+  # Copy elements
+  arr := list(tLen)
+  iA := 1 ; iB := 1
+  every i := 1 to tLen do
+    (iA > n | b[iB] < a[iA] & arr[i] := b[iB] & iB +:= 1) |
+    (arr[i] := a[iA] & iA +:= 1)
+
+  return arr
+
+end
+
+# -------------------------------------------------------------------
+
+procedure MS()
+
+  f := open("ms.txt","r")
+  size := lineToInts(read(f))[1]
+  arr := lineToInts(read(f))
+  close(f)
+
+  arr := mSort(arr, size)
+  every writes(!arr," ")
+  write()
+
+end
+
+procedure mSort(lst, size)
+
+  if 1 = size then {
+    return lst
+  } else {
+
+    sh2 := size - (sh1 := (h := size / 2 + 1) - 1)
+    return merge(mSort(lst[1:h], sh1), mSort(lst[h:0], sh2), sh1, sh2)
+
+  }
+
+end
+
+# -------------------------------------------------------------------
+
+procedure SUM2()
+
+  f := open("sum2.txt","r")
+  fst := lineToInts(read(f))
+  k := fst[1] ; n := fst[2]
+  arrays := list(k)
+  every i := 1 to k do
+    arrays[i] := lineToInts(read(f))
+  close(f)
+
+  version := 2
+
+  # Original version
+  if 1 = version then {
+
+    every array := !arrays do {
+      str := "-1"
+      every f := 1 to n - 1 do {
+        every s := f + 1 to n do
+          -1 * array[f] = array[s] & str := f || " " || s & break
+        "-1" ~== str & break
+      }
+      write(str)
+    }
+
+  # Version based on explanation
+  } else {
+
+    every lst := !arrays do {
+
+      t := table(0)
+      every i := 1 to n do t[lst[i]] := i
+
+      str := "-1" ; zeros := []
+      every i := 1 to n do {
+        if 0 = lst[i] then
+          put(zeros,i) & 2 = *zeros & str := zeros[1] || " " || zeros[2] & break
+        else
+          other := -lst[i] & 0 ~= t[other] & str := i || " " || t[other] & break
+      }
+
+      write(str)
+
+    }
+
+  }
+
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
@@ -217,7 +331,10 @@ procedure main()
   #DEG()
   #INS()
   #DDEG()
-  MAJ()
+  #MAJ()
+  #MER()
+  #MS()
+  SUM2()
 
 end
 
