@@ -97,8 +97,7 @@ procedure DEG()
   close(f)
 
   # Initialize array for all vertices
-  t := table()
-  every t[1 to ves[1]] := 0
+  t := list(ves[1], 0)
 
   # Count occurrences
   every t[(!edges)[1 to 2]] +:= 1
@@ -113,6 +112,100 @@ end
 # -------------------------------------------------------------------
 
 procedure INS()
+
+  # Read data
+  f := open("ins.txt","r")
+  n := lineToInts(read(f))[1]
+  arr := lineToInts(read(f))
+  close(f)
+
+  swap := 0
+  every i := 1 to n do {
+    k := i
+    while k > 1 & arr[k] < arr[k - 1] do {
+      arr[k] :=: arr[k - 1]
+      k -:= 1
+    }
+    swap +:= i - k
+  }
+
+  # Sorted array
+  every writes(!arr," ") ; write()
+
+  # Number of swaps
+  write(swap)
+
+end
+
+# -------------------------------------------------------------------
+
+procedure DDEG()
+
+  # Read data
+  f := open("ddeg.txt", "r")
+  ves := lineToInts(read(f))
+  edges := []
+  while put(edges, lineToInts(read(f)))
+  close(f)
+
+  # Create adjacency list
+  adjList := list(ves[1])
+  every !adjList := []
+  every e := !edges do {
+    push(adjList[e[1]], e[2])
+    push(adjList[e[2]], e[1])
+  }
+
+  # Create occurrences list
+  occurrences := list(ves[1], 0)
+  every occurrences[(!edges)[1 to 2]] +:= 1
+
+  # Vertices
+  every i := 1 to ves[1] do {
+
+    # Sum occurrences of all neighbours
+    sum := 0
+    every sum +:= occurrences[!adjList[i]]
+    writes(sum, " ")
+
+  }
+
+  write()
+
+end
+
+# -------------------------------------------------------------------
+
+procedure MAJ()
+
+  # Read data
+  f := open("maj.txt", "r")
+  fst := lineToInts(read(f))
+  every !(arrays := list(fst[1])) := lineToInts(read(f))
+  close(f)
+
+  # Half array
+  h := fst[2] / 2
+
+  # Arrays
+  every a := !arrays do {
+
+    # Occurrences
+    t := table(0)
+    every t[!a] +:= 1
+
+    # Max occurrences
+    maxKey := ""
+    every k := key(t) do
+      t[k] > t[maxKey] & maxKey := k
+
+    # Element or -1
+    writes((t[maxKey] > h & maxKey) | -1, " ")
+
+  }
+
+  write()
+
 end
 
 # -------------------------------------------------------------------
@@ -122,7 +215,9 @@ procedure main()
   #FIBO()
   #BINS()
   #DEG()
-  INS()
+  #INS()
+  #DDEG()
+  MAJ()
 
 end
 
