@@ -379,6 +379,70 @@ end
 
 # -------------------------------------------------------------------
 
+procedure PPER()
+
+  n := 21 ; k := 7 ; m := 1000000
+
+  p := 1 ; nk := n - k + 1
+  every p *:= (n to nk by -1) & p %:= m
+
+  write(p)
+
+end
+
+
+# -------------------------------------------------------------------
+
+procedure LEXF()
+
+  # Data
+  f := open("lexf.txt","r")
+  al := read(f)
+  n := lineToInts(read(f))[1]
+  close(f)
+
+  # Alphabet without whitespaces
+  al ?:= {
+    l := ""
+    while tab(upto(&letters)) do
+      l ||:= tab(many(&letters))
+    l
+  }
+
+  every write(!lex(n,al))
+
+end
+
+procedure lex(level,al)
+
+  if 1 = level then {
+
+    return al
+
+  } else {
+
+    words := []
+
+    every put(words, !al || !(lex(level - 1, al)))
+
+    return words
+
+  }
+
+end
+
+# -------------------------------------------------------------------
+
+procedure REVP()
+end
+
+# -------------------------------------------------------------------
+
+procedure LGIS()
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
@@ -390,7 +454,10 @@ procedure main()
   #MER()
   #MS()
   #SUM2()
-  BFS()
+  #BFS()
+  #PPER()
+  #LEXF()
+  REVP()
 
 end
 
