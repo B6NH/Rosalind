@@ -288,11 +288,11 @@ procedure SUM2()
   # Original version
   if 1 = version then {
 
-    every array := !arrays do {
+    every arr := !arrays do {
       str := "-1"
       every f := 1 to n - 1 do {
         every s := f + 1 to n do
-          -1 * array[f] = array[s] & str := f || " " || s & break
+          -1 * arr[f] = arr[s] & str := f || " " || s & break
         "-1" ~== str & break
       }
       write(str)
@@ -434,11 +434,121 @@ end
 # -------------------------------------------------------------------
 
 procedure REVP()
+
+  f := open("revp.txt","r")
+  strName := read(f)
+  str := ""
+  while str ||:= read(f)
+  close(f)
+
+  comp := table()
+  comp["G"] := "C" ; comp["C"] := "G"
+  comp["A"] := "T" ; comp["T"] := "A"
+
+  strLen := *str ; s1 := strLen + 1
+  every i := 1 to strLen do {
+    every j := 4 to 12 by 2 do {
+      i + j > s1 & break
+      s := str[i+:j]
+      revComp(s,comp) == s & write(i, " ",j)
+    }
+  }
+
+end
+
+procedure revComp(str,t)
+  str := reverse(str)
+  every i := 1 to *str do
+    str[i] := t[str[i]]
+  return str
 end
 
 # -------------------------------------------------------------------
 
 procedure LGIS()
+
+  f := open("lgis.txt","r")
+  len := lineToInts(read(f))[1]
+  arr := lineToInts(read(f))
+  close(f)
+
+  # Save indices
+  tb := table()
+  every i := 1 to *arr do
+    tb[arr[i]] := i
+
+  sequences := []
+  every i := 1 to *arr do {
+    currentIndex := i
+    sequence := []
+    while 0 ~= currentIndex do {
+      put(sequence,arr[currentIndex])
+      rest := arr[currentIndex+1:0]
+      currentIndex := smallest(rest,arr[currentIndex],tb) | 0
+    }
+    push(sequences,sequence)
+  }
+
+  every seq := !sequences do {
+    every writes(!seq," ")
+    write()
+  }
+
+end
+
+procedure smallest(lst,n,tb)
+
+  lst := sort(lst)
+  every e := !lst do {
+    if e > n & tb[n] < tb[e] then
+      return tb[e]
+  }
+
+  fail
+
+end
+
+# -------------------------------------------------------------------
+
+procedure SSEQ()
+
+  str1 := "ACGTACGTGACG"
+  str2 := "GTA"
+
+  i1 := 1 ; i2 := 1
+  while i2 <= *str2 do {
+    if str2[i2] == str1[i1] then {
+      writes(i1," ")
+      i2 +:= 1
+    }
+    i1 +:= 1
+  }
+
+  write()
+
+end
+
+# -------------------------------------------------------------------
+
+procedure PMCH()
+
+  f := open("pmch.txt","r")
+  strName := read(f)
+  str := ""
+  while str ||:= read(f)
+  close(f)
+
+  bases := table(0)
+  every b := !str do
+    if b == "A" | "G" then
+      bases[b] +:= 1
+
+  write(factorial(bases["A"]) * factorial(bases["G"]))
+
+end
+
+procedure factorial(n)
+  return if n = 1 then 1 else n * factorial(n - 1)
 end
 
 # -------------------------------------------------------------------
@@ -457,7 +567,10 @@ procedure main()
   #BFS()
   #PPER()
   #LEXF()
-  REVP()
+  #REVP()
+  #LGIS() ?
+  #SSEQ()
+  PMCH()
 
 end
 
