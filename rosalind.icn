@@ -553,6 +553,95 @@ end
 
 # -------------------------------------------------------------------
 
+procedure PAR()
+
+  f := open("par.txt","r")
+  arrSize := lineToInts(read(f))[1]
+  arr := lineToInts(read(f))
+  close(f)
+
+  i := 0 ; rightI := *arr ; brk := 0
+
+  while 0 = brk & rightI ~= (i +:= 1) do {
+
+    while arr[i] > arr[1] do {
+      arr[i] :=: arr[rightI]
+      rightI -:= 1
+      if i = rightI then {
+        brk := 1 ; break
+      }
+    }
+
+  }
+
+  arr[1] :=: arr[i - (if arr[i] > arr[1] then 1 else 0)]
+
+  every writes(!arr," ")
+  write()
+
+end
+
+# -------------------------------------------------------------------
+
+procedure CC()
+
+  # Input
+  f := open("cc.txt","r")
+  fst := lineToInts(read(f))
+  numNodes := fst[1] ; numEdges := fst[2]
+  edges := []
+  while put(edges,lineToInts(read(f)))
+  close(f)
+
+  # Initialize node sets
+  outs := table()
+  every outs[1 to numNodes] := set()
+
+  # Set node links
+  every e := !edges do {
+    insert(outs[e[1]],e[2])
+    insert(outs[e[2]],e[1])
+  }
+
+  components := 0 ; knownNodes := set()
+  while *knownNodes < numNodes do {
+
+    # Find first unknown node
+    every i := 1 to numNodes do
+      if not(member(knownNodes,i)) then
+        node := i
+
+    # Nodes in component
+    kn := set()
+
+    # Add new nodes
+    knownNodes := knownNodes ++ dfs(node,kn,outs)
+
+    components +:= 1
+
+  }
+
+  write(components)
+
+end
+
+procedure dfs(node,knownNodes,outs)
+
+  # Add current node
+  insert(knownNodes,node)
+
+  # Depth first search
+  every n := !outs[node] do
+    if not(member(knownNodes,n)) then
+      dfs(n,knownNodes,outs)
+
+  # Return connected nodes
+  return knownNodes
+
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
@@ -570,7 +659,9 @@ procedure main()
   #REVP()
   #LGIS() ?
   #SSEQ()
-  PMCH()
+  #PMCH()
+  #PAR()
+  CC()
 
 end
 
