@@ -642,6 +642,63 @@ end
 
 # -------------------------------------------------------------------
 
+procedure LEXV()
+
+  f := open("lexv.txt","r")
+  line := read(f)
+  length := read(f)
+  close(f)
+
+  strings := []
+  line ? {
+    while tab(upto(&letters)) do
+      put(strings,tab(many(&letters)))
+  }
+
+  every write(!nLetterWords(length,strings))
+
+end
+
+procedure nLetterWords(n,strings)
+
+  if n = 1 then
+    return strings
+  else {
+
+    words := []
+
+    every s := !strings do {
+      put(words,s)
+      nextWords := nLetterWords(n - 1,strings)
+      every put(words,s || !nextWords)
+    }
+
+    return words
+
+  }
+
+end
+
+# -------------------------------------------------------------------
+
+procedure TREE()
+
+  f := open("tree.txt","r")
+  numNodes := read(f)
+  edges := []
+  while push(edges,lineToInts(read(f)))
+  close(f)
+
+  allEdges := numNodes - 1
+  write(allEdges - *edges)
+
+  # Or
+  # numComponents - 1 + missingNodes
+
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
@@ -661,7 +718,9 @@ procedure main()
   #SSEQ()
   #PMCH()
   #PAR()
-  CC()
+  #CC()
+  #LEXV()
+  TREE()
 
 end
 
