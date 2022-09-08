@@ -1,12 +1,71 @@
 #!/usr/bin/rexx
 
-call HEA
+/* call HEA 'hea.txt' */
+call HS
 
 exit 0
 
-HEA: procedure
+HS: procedure
 
-  f = 'hea.txt'
+  /* Create heap */
+  call HEA 'hs.txt'
+
+  hSize = arr.0
+  do i = arr.0 to 2 by -1
+
+    /* Swap last element with root */
+    tmp = arr.hSize
+    arr.hSize = arr.1
+    arr.1 = tmp
+
+    /* Decrease heap size */
+    hSize = hSize - 1
+
+    cIndex = 1
+    do forever
+
+      l = cIndex * 2
+      r = l + 1
+
+      if l <= hSize & arr.l > arr.cIndex & (r > hSize | arr.r <= arr.l) then
+
+        /* Move left */
+        do
+          tmp = arr.cIndex
+          arr.cIndex = arr.l
+          arr.l = tmp
+          cIndex = l
+        end
+
+      else if r <= hSize & arr.r > arr.cIndex then
+
+        /* Move right */
+        do
+          tmp = arr.cIndex
+          arr.cIndex = arr.r
+          arr.r = tmp
+          cIndex = r
+        end
+
+      else
+
+        leave
+      
+    end
+
+  end
+
+  /* Result */
+  do i = 1 to arr.0
+    call charout , arr.i' '
+  end
+  say ''
+
+  return
+
+HEA: procedure expose arr.
+
+  parse arg f
 
   /* Set array size */
   arr.0 = linein(f)
@@ -39,10 +98,12 @@ HEA: procedure
   end
 
   /* Display result */
+  /*
   do i = 1 to arr.0
     call charout , arr.i' '
   end
   say ''
+  */
 
   return
 
