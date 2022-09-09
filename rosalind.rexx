@@ -1,14 +1,50 @@
 #!/usr/bin/rexx
 
 /* call HEA 'hea.txt' */
-call HS
+/* call HS 'hs.txt' */
+call PS 'ps.txt'
 
 exit 0
 
-HS: procedure
+PS: procedure
+
+  parse arg f
+
+  /* Read data */
+  arr.0 = linein(f)
+  call lineToInts linein(f)
+  k = linein(f)
+
+  do i = 1 to k
+
+    /* Find smallest value */
+    m = i
+    do j = i + 1 to arr.0
+      if arr.j < arr.m then
+        m = j
+    end
+
+    /* Swap */
+    tmp = arr.i
+    arr.i = arr.m
+    arr.m = tmp
+
+  end
+
+  /* Show result */
+  do i = 1 to k
+    call charout , arr.i' '
+  end
+  say ''
+
+  return
+
+HS: procedure expose arr.
+
+  parse arg f
 
   /* Create heap */
-  call HEA 'hs.txt'
+  call HEA f
 
   hSize = arr.0
   do i = arr.0 to 2 by -1
@@ -56,10 +92,12 @@ HS: procedure
   end
 
   /* Result */
+  /*
   do i = 1 to arr.0
     call charout , arr.i' '
   end
   say ''
+  */
 
   return
 

@@ -699,6 +699,95 @@ end
 
 # -------------------------------------------------------------------
 
+procedure SQ()
+
+  # Read graph data
+  f := open("sq.txt","r")
+  nGraphs := read(f)
+  read(f)
+  graphs := []
+  every 1 to nGraphs do {
+    edges := []
+    while (line := read(f)) ~== "" do {
+      put(edges,lineToInts(line))
+    }
+    put(graphs,edges)
+  }
+  close(f)
+
+  # Process graphs
+  every graph := !graphs do {
+
+    # Find number of nodes
+    nodes := set()
+    every edge := !graph do {
+      insert(nodes,edge[1])
+      insert(nodes,edge[2])
+    }
+
+    # Set number of nodes in graph
+    numNodes := *nodes
+
+    # Initialize adjacency matrix
+    matrix := list(numNodes)
+    every matrix[1 to numNodes] := list(numNodes,0)
+
+    # Set connections in matrix
+    every edge := !graph do {
+
+      # Ignore node connection to itself
+      if edge[1] ~= edge[2] then {
+        matrix[edge[1],edge[2]] := 1
+        matrix[edge[2],edge[1]] := 1
+      }
+
+    }
+
+    # Check combinations of matrix rows
+    brk := -1
+    every i := 1 to numNodes - 1 do {
+      every j := i + 1 to numNodes do {
+
+        # Nodes have at least two common neighbors
+        if atLeastTwo(andRows(matrix[i],matrix[j])) then {
+          brk := 1 ; break
+        }
+
+      }
+
+      if 1 = brk then break
+
+    }
+
+    # Display 1/-1
+    writes(brk," ")
+
+  }
+
+  write()
+
+end
+
+procedure andRows(row1,row2)
+
+  len := *row1
+  result := list(len,0)
+
+  every i := 1 to len do
+    if 1 = row1[i] & 1 = row2[i] then
+      result[i] := 1
+
+  return result
+
+end
+
+procedure atLeastTwo(arr)
+  sum := 0
+  every 1 = !arr & sum +:= 1 & 2 = sum & return 1
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
@@ -720,7 +809,8 @@ procedure main()
   #PAR()
   #CC()
   #LEXV()
-  TREE()
+  #TREE()
+  SQ()
 
 end
 
