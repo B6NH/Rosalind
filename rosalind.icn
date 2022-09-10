@@ -788,6 +788,81 @@ end
 
 # -------------------------------------------------------------------
 
+procedure INOD()
+
+  leaves := 4
+  edges := leaves * 2 - 2
+  nodes := edges + 1
+
+  write("Leaves: ",leaves)
+  write("Edges: ",edges)
+  write("Nodes: ",nodes)
+  write("Internal nodes: ",nodes - leaves - 1)
+
+end
+
+# -------------------------------------------------------------------
+
+procedure PDST()
+
+  # Read strings
+  f := open("pdst.fasta","r")
+  str := ""
+  strings := []  
+  while line := read(f) do {
+    if line[1] == ">" then {
+      if "" ~== str then {
+        put(strings,str)
+        str := ""
+      }    
+    } else {
+      str ||:= line
+    }
+  }
+  put(strings,str)
+  close(f)
+
+  # Calculate distances
+  distances := []
+  every i := 1 to *strings - 1 do {
+    every j := i + 1 to *strings do {
+      put(distances,[[i,j],pDistance(strings[i],strings[j])])
+    }
+  }
+
+  # Initialize matrix
+  matrix := list(*strings)
+  every !matrix := list(*strings,0)
+
+  # Fill matrix
+  every d := !distances do {
+    pos := d[1] ; val := d[2]
+    matrix[pos[1],pos[2]] := val
+    matrix[pos[2],pos[1]] := val
+  }
+
+  # Display matrix
+  every row := !matrix do {
+    every writes(!row," ")
+    write()
+  }
+
+end
+
+procedure pDistance(str1,str2)
+
+  d := 0 ; len := *str1
+  every i := 1 to len do {
+    if str1[i] ~== str2[i] then
+      d +:= 1
+  }
+
+  return real(d) / len
+
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
@@ -810,7 +885,9 @@ procedure main()
   #CC()
   #LEXV()
   #TREE()
-  SQ()
+  #SQ()
+  #INOD()
+  PDST()
 
 end
 
