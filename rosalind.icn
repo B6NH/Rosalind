@@ -806,21 +806,7 @@ end
 procedure PDST()
 
   # Read strings
-  f := open("pdst.fasta","r")
-  str := ""
-  strings := []  
-  while line := read(f) do {
-    if line[1] == ">" then {
-      if "" ~== str then {
-        put(strings,str)
-        str := ""
-      }    
-    } else {
-      str ||:= line
-    }
-  }
-  put(strings,str)
-  close(f)
+  strings := readStrings("pdst.fasta")
 
   # Calculate distances
   distances := []
@@ -861,6 +847,104 @@ procedure pDistance(str1,str2)
 
 end
 
+procedure readStrings(file)
+
+  f := open(file,"r")
+  str := ""
+  strings := []
+  while line := read(f) do {
+    if line[1] == ">" then {
+      if "" ~== str then {
+        put(strings,str)
+        str := ""
+      }
+    } else {
+      str ||:= line
+    }
+  }
+  put(strings,str)
+  close(f)
+
+  return strings
+
+end
+
+# -------------------------------------------------------------------
+
+procedure SSET()
+
+  n := 3
+
+  write(2^n%1000000)
+
+end
+
+# -------------------------------------------------------------------
+
+procedure LONG()
+
+  # Read strings from file
+  strings := readStrings("long.fasta")
+
+  # Choose first string
+  accumulatedString := pop(strings)
+
+  # Find next string to connect
+  while 0 ~= *strings do {
+
+    every i := 1 to *strings do {
+
+      # Merge matching string and delete it from list
+      if "" ~== (nxt := mergeStrings(accumulatedString,strings[i])) then {
+        delete(strings,i)
+        accumulatedString := nxt
+        break
+      }
+
+    }
+
+  }
+
+  # Result
+  write(accumulatedString)
+
+end
+
+procedure mergeStrings(str1,str2)
+
+  # More than half length
+  hLen := *str2 / 2 + 1
+
+  # Beginning and ending of first string
+  beginning := str1[1+:hLen]
+  ending := str1[0+:-hLen]
+
+  every i := 1 to *str2 - hLen + 1 do {
+
+    # Substring from second string
+    currentSubstring := str2[i+:hLen]
+
+    if currentSubstring == beginning then {
+
+      # Beginning of first string found in second string
+      # Return part of second string and all of the first string
+      return str2[1:i] || str1
+
+    } else if currentSubstring == ending then {
+
+      # Ending of first string found in second string
+      # Return first string and part after ending from second string
+      return str1 || str2[i+hLen:0]
+
+    }
+
+  }
+
+  # Strings don't match
+  return ""
+
+end
+
 # -------------------------------------------------------------------
 
 procedure main()
@@ -887,7 +971,9 @@ procedure main()
   #TREE()
   #SQ()
   #INOD()
-  PDST()
+  #PDST()
+  #SSET()
+  LONG()
 
 end
 
