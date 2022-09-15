@@ -1038,6 +1038,110 @@ proc TRAN {} {
 
 # -------------------------------------------------------------------
 
+proc SIGN {} {
+
+  # Input
+  set n 3
+
+  # Version 1 or 2
+  set version 2
+
+  # Number of signed permutations
+  set numSignedPerms [expr {[fact $n] * 2 ** $n}]
+
+  # List of unsigned elements
+  for {set i 1} {$i <= $n} {incr i} { lappend elements $i }
+
+  puts $numSignedPerms
+
+  # Version 1
+  if {1 == $version} {
+
+    # Signed permutations
+    set pers [signedPerms $elements]
+
+    # Display permutations
+    for {set i 0} {$i < [llength $pers]} {incr i} {
+      puts [lindex $pers $i]
+    }
+
+  # Version 2
+  } else {
+
+    # Generate masks of length n
+    set masks [genMasks $n]
+
+    # Unsigned permutations
+    set uPerms [perms $elements]
+
+    foreach p $uPerms {
+      foreach m $masks {
+        for {set i 0} {$i < $n} {incr i} {
+          puts -nonewline "[expr {1 == [lindex $m $i] ? "-" : ""}][lindex $p $i] "
+        }
+        puts ""
+      }
+    }
+
+  }
+
+}
+
+# Generate binary numbers to select negative elements
+proc genMasks {n} {
+
+  if {1 == $n} {
+    return {0 1}
+  } else {
+
+    set vals {}
+    set nxt [genMasks [expr {$n - 1}]]
+
+    foreach m $nxt { lappend vals [linsert $m 0 0] }
+    foreach m $nxt { lappend vals [linsert $m 0 1] }
+
+    return $vals
+
+  }
+
+}
+
+proc signedPerms {elements} {
+
+  set len [llength $elements]
+
+  if {1 == $len} {
+    return "$elements -$elements"
+  } else {
+
+    set pms {}
+    for {set i 0} {$i < $len} {incr i} {
+
+      set el [lindex $elements $i]
+
+      # Permutations of elements without el
+      set ps [signedPerms [lreplace $elements $i $i]]
+
+      # All permutations with positive el as first element
+      foreach p $ps { lappend pms "$el $p" }
+
+      # All permutations with negative el as first element
+      foreach p $ps { lappend pms "-$el $p" }
+
+    }
+
+    return $pms
+
+  }
+
+}
+
+proc fact {x} {
+  return [expr {1 == $x ? 1 : $x * [fact [expr {$x - 1}]]}]
+}
+
+# -------------------------------------------------------------------
+
 #DNA
 #RNA
 #REVC
@@ -1060,7 +1164,8 @@ proc TRAN {} {
 #MPRT
 #SPLC
 #PROB
-TRAN
+#TRAN
+SIGN
 
 # -------------------------------------------------------------------
 
