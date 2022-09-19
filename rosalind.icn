@@ -836,14 +836,18 @@ procedure PDST()
 end
 
 procedure pDistance(str1,str2)
+  return real(hDistance(str1,str2)) / *str1
+end
 
-  d := 0 ; len := *str1
-  every i := 1 to len do {
+procedure hDistance(str1,str2)
+
+  d := 0
+  every i := 1 to *str1 do {
     if str1[i] ~== str2[i] then
       d +:= 1
   }
 
-  return real(d) / len
+  return d
 
 end
 
@@ -947,6 +951,82 @@ end
 
 # -------------------------------------------------------------------
 
+procedure CORR()
+
+  # Read strings
+  strings := readStrings("corr.fasta")
+
+  # Complements
+  comp := table()
+  comp["G"] := "C" ; comp["C"] := "G"
+  comp["A"] := "T" ; comp["T"] := "A"
+
+  # Find correct and erroneous readings
+  wrongStrings := set() ; correctStrings := set()
+  every i := 1 to *strings do {
+
+    currentString := strings[i]
+
+    # String already accepted
+    if member(correctStrings,currentString) then next
+
+    good := 0
+    every j := i + 1 to *strings do {
+
+      otherString := strings[j]
+
+      if (currentString == otherString) | isRevComp(currentString,otherString,comp) then {
+
+        # Add two correct strings
+        insert(correctStrings,strings[i],strings[j]) ; good := 1 ; break
+
+      }
+
+    }
+
+    # Add wrong string
+    if 0 = good then insert(wrongStrings,strings[i])
+
+  }
+
+  # Correct strings
+  every ws := !wrongStrings do {
+
+    writes(ws,"->")
+
+    every cs := !correctStrings do {
+      if c := strCorr(ws,cs,comp) then {
+        writes(c) ; write() ; break
+      }
+    }
+
+  }
+
+end
+
+procedure strCorr(badString,goodString,t)
+
+  # Normal distance
+  d := hDistance(badString,goodString)
+  if 1 = d then {
+    return goodString
+  } else {
+
+    # Reverse complement distance
+    rc := revComp(goodString,t)
+    d := hDistance(badString,rc)
+    if 1 = d then return rc
+
+  }
+
+end
+
+procedure isRevComp(str1,str2,t)
+  if str1 == revComp(str2,t) then return 1
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
@@ -973,7 +1053,8 @@ procedure main()
   #INOD()
   #PDST()
   #SSET()
-  LONG()
+  #LONG()
+  CORR()
 
 end
 
