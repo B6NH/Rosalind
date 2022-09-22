@@ -1027,6 +1027,49 @@ end
 
 # -------------------------------------------------------------------
 
+procedure KMER()
+
+  kmerLength := 4
+  string := readStrings("kmer.fasta")[1]
+
+  # Letters
+  alphabet := "ACGT"
+  
+  # Function lex from LEXF problem
+  kmers := lex(kmerLength,alphabet)
+
+  every kmer := !kmers do {
+
+    # Find kmer in string
+    counter := 0
+    every find(kmer,string) do counter +:= 1
+
+    # Number of occurrences
+    writes(counter," ")
+
+  }
+
+  write()
+
+end
+
+# -------------------------------------------------------------------
+
+procedure KMP()
+end
+
+# -------------------------------------------------------------------
+
+procedure ASPC()
+end
+
+# -------------------------------------------------------------------
+
+procedure SETO()
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
@@ -1054,7 +1097,11 @@ procedure main()
   #PDST()
   #SSET()
   #LONG()
-  CORR()
+  #CORR()
+  #KMER()
+  KMP()
+  ASPC()
+  SETO()
 
 end
 
