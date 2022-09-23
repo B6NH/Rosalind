@@ -548,7 +548,7 @@ procedure PMCH()
 end
 
 procedure factorial(n)
-  return if n = 1 then 1 else n * factorial(n - 1)
+  return if n = (1 | 0) then 1 else n * factorial(n - 1)
 end
 
 # -------------------------------------------------------------------
@@ -1061,6 +1061,37 @@ end
 # -------------------------------------------------------------------
 
 procedure ASPC()
+
+  n := 6 ; m := 3
+
+  # List of factorials
+  factorials := factorialsUpTo(n)
+
+  # Number of combinations
+  sum := 0 ; lastIndex := n + 1 ; la1 := lastIndex + 1
+  every k := m + 1 to lastIndex do
+    sum +:= factorials[lastIndex] / (factorials[la1 - k] * factorials[k])
+
+  # Result
+  write(sum % 1000000)
+
+end
+
+procedure factorialsUpTo(n)
+
+  # Create and initialize list
+  maxI := n + 1
+  factorials := list(maxI)
+  factorials[1] := factorials[2] := 1
+
+  # Calculate factorials
+  every i := 3 to maxI do {
+    i1 := i - 1
+    factorials[i] := factorials[i1] * i1
+  }
+
+  return factorials
+
 end
 
 # -------------------------------------------------------------------
