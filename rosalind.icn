@@ -489,8 +489,8 @@ procedure LGIS()
     push(sequences,sequence)
   }
 
-  every seq := !sequences do {
-    every writes(!seq," ")
+  every sq := !sequences do {
+    every writes(!sq," ")
     write()
   }
 
@@ -822,9 +822,9 @@ procedure PDST()
 
   # Fill matrix
   every d := !distances do {
-    pos := d[1] ; val := d[2]
-    matrix[pos[1],pos[2]] := val
-    matrix[pos[2],pos[1]] := val
+    ps := d[1] ; val := d[2]
+    matrix[ps[1],ps[2]] := val
+    matrix[ps[2],ps[1]] := val
   }
 
   # Display matrix
@@ -1030,7 +1030,7 @@ end
 procedure KMER()
 
   kmerLength := 4
-  string := readStrings("kmer.fasta")[1]
+  str := readStrings("kmer.fasta")[1]
 
   # Letters
   alphabet := "ACGT"
@@ -1042,7 +1042,7 @@ procedure KMER()
 
     # Find kmer in string
     counter := 0
-    every find(kmer,string) do counter +:= 1
+    every find(kmer,str) do counter +:= 1
 
     # Number of occurrences
     writes(counter," ")
@@ -1097,6 +1097,96 @@ end
 # -------------------------------------------------------------------
 
 procedure SETO()
+
+  # Open file
+  f := open("seto.txt","r")
+
+  # Read max value
+  maxValue := integer(read(f))
+
+  # Read two sets
+  sets := list(2)
+  every i := 1 to 2 do {
+
+    line := read(f)
+
+    lst := []
+    line ?
+      while tab(upto(&digits)) do
+        push(lst,integer(tab(many(&digits))))
+
+    sets[i] := lst
+
+  }
+
+  close(f)
+
+  # Union and intersection
+  dispS(union(sets[1],sets[2]))
+  dispS(intersection(sets[1],sets[2]))
+
+  # Difference
+  dispS(difference(sets[1],sets[2]))
+  dispS(difference(sets[2],sets[1]))
+
+  # Complement
+  dispS(complementN(sets[1],maxValue))
+  dispS(complementN(sets[2],maxValue))
+
+end
+
+procedure union(a,b)
+  return(difun(copy(b),a,b))
+end
+
+procedure difference(a,b)
+  return(difun([],a,b))
+end
+
+procedure intersection(a,b)
+
+  lst := []
+  every el := !a do
+    if el = !b then push(lst,el)
+
+  return lst
+
+end
+
+procedure complementN(a,n)
+
+  lst := []
+  every i := 1 to n do
+    if not(i = !a) then push(lst,i)
+
+  return lst
+
+end
+
+procedure difun(lst,a,b)
+
+  every el := !a do
+    if not(el = !b) then push(lst,el)
+
+  return lst
+
+end
+
+procedure dispS(s)
+  writes("{")
+  every writes(s[1 to *s - 1],", ")
+  writes(s[-1],"}")
+  write()
+end
+
+# -------------------------------------------------------------------
+
+procedure NWCK()
+end
+
+# -------------------------------------------------------------------
+
+procedure TRIE()
 end
 
 # -------------------------------------------------------------------
@@ -1130,9 +1220,11 @@ procedure main()
   #LONG()
   #CORR()
   #KMER()
-  KMP()
-  ASPC()
+  #KMP() ?
+  #ASPC()
   SETO()
+  NWCK()
+  TRIE()
 
 end
 
