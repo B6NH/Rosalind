@@ -1187,6 +1187,45 @@ end
 # -------------------------------------------------------------------
 
 procedure TRIE()
+
+  # Read strings
+  f := open("trie.txt","r")
+  strings := []
+  while put(strings,read(f))
+  close(f)
+
+  # Display trie starting from node 1
+  makeTrie(strings,1)
+
+end
+
+procedure makeTrie(strings,parentIndex)
+
+  # Find unique first letters
+  uniqueFirst := set()
+  every insert(uniqueFirst,(!strings)[1])
+
+  # First child has index 1 greater than parent
+  nextIndex := parentIndex + 1
+
+  # Go through unique letters
+  every u := !uniqueFirst do {
+
+    # Display edge
+    write(parentIndex," ",nextIndex," ",u)
+
+    # Collect strings without first letter for this branch
+    nextStrings := []
+    every str := !strings do if u == str[1] then put(nextStrings,str[2:0])
+
+    # Go down and set next child's index
+    nextIndex := makeTrie(nextStrings,nextIndex)
+
+  }
+
+  # Return next index
+  return nextIndex
+
 end
 
 # -------------------------------------------------------------------
@@ -1222,8 +1261,8 @@ procedure main()
   #KMER()
   #KMP() ?
   #ASPC()
-  SETO()
-  NWCK()
+  #SETO()
+  #NWCK()
   TRIE()
 
 end
