@@ -1182,6 +1182,82 @@ end
 # -------------------------------------------------------------------
 
 procedure NWCK()
+
+  # Open file
+  f := open("nwck.txt","r")
+
+  # Set of characters
+  ltrs := &letters ++ '_'
+
+  # Read tree and names
+  while tree := read(f) do {
+
+    names := read(f)
+
+    names ? {
+      nodeA := tab(many(ltrs))
+      tab(upto(ltrs))
+      nodeB := tab(many(ltrs))
+    }
+
+    read(f)
+
+    # Display distance between nodes
+    writes(nodeDistance(nodeA,nodeB,tree)," ")
+
+  }
+
+  close(f)
+
+  write()
+
+end
+
+procedure nodeDistance(nodeA,nodeB,tree)
+
+  # Find paths to root
+  pathA := pathToRoot(tree,nodeA)
+  pathB := pathToRoot(tree,nodeB)
+
+  # Find first common node in path
+  every i := 1 to *pathA do {
+    if pathA[i] = pathB[j := 1 to *pathB] then {
+      return i + j - 2
+    }
+  }
+
+end
+
+procedure pathToRoot(tree,node)
+
+  # Find node
+  position := find(node,tree)
+
+  # Initialize path
+  c := 0 ; path := [position - 1]
+
+  # Find higher nodes
+  every i := position to *tree do {
+
+    s := tree[i]
+
+    if s == "(" then {
+      c +:= 1
+    } else if s == ")" then {
+
+      # Save node position in tree
+      if c <= 0 then {
+        put(path,i)
+      } else {
+        c -:= 1
+      }
+
+    }
+
+  }
+
+  return path
+
 end
 
 # -------------------------------------------------------------------
@@ -1262,8 +1338,8 @@ procedure main()
   #KMP() ?
   #ASPC()
   #SETO()
-  #NWCK()
-  TRIE()
+  NWCK()
+  #TRIE()
 
 end
 
