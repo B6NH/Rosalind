@@ -571,69 +571,25 @@ proc fSubH {str start len} {
 
 proc LIA {} {
 
-  set k 2 ; set n 1 ; set tom {S s B b}
+  # Generation
+  set k 2
 
-  set gn [calOff 2 $tom $tom $tom]
-  set gnLen [llength $gn]
+  # At least n organisms Aa Bb
+  set n 1
 
-  set tot 0
-  foreach o $gn {
-    if {$o == $tom} { incr tot }
+  # Number of organisms in generation
+  set org [expr {$k ** 2}]
+
+  # P(Aa) * P(Bb)
+  set prob [expr {0.5 ** 2}]
+
+  set sum 0
+  for {set i $n} {$i <= $org} {incr i} {
+    set sum [expr {$sum + ([fact $org] / ([fact $i] * ([fact [expr $org - $i]]))) *\
+                          (($prob ** $i) * (1 - $prob) ** ($org - $i))}]
   }
 
-  puts $tot
-  puts $gnLen
-  puts [expr {double($tot) / $gnLen}]
-
-}
-
-proc calP {org} {
-
-  set p {}
-  for {set i 0} {$i < 2} {incr i} {
-    for {set j 2} {$j < 4} {incr j} {
-      lappend p "[lindex $org $i] [lindex $org $j]"
-    }
-  }
-
-  return $p
-
-}
-
-proc calG {level p1 p2} {
-
-  set s 4 ; set gn {}
-
-  for {set i 0} {$i < $s} {incr i} {
-    for {set j 0} {$j < $s} {incr j} {
-
-      set organism "[lindex $p1 $i 0] [lindex $p2 $j 0]\
-                    [lindex $p1 $i 1] [lindex $p2 $j 1]"
-
-      lappend gn $organism
-
-    }
-  }
-
-  return $gn
-
-}
-
-proc calOff {level org1 org2 tom} {
-
-  set p1 [calP $org1]
-  set p2 [calP $org2]
-  set off [calG $level $p1 $p2]
-
-  if {1 == $level} {
-    return $off
-  } else {
-    set result {}
-    foreach o $off {
-      set result [concat $result [calOff [expr {$level - 1}] $tom $o $tom]]
-    }
-    return $result
-  }
+  puts $sum
 
 }
 
@@ -1137,7 +1093,7 @@ proc signedPerms {elements} {
 }
 
 proc fact {x} {
-  return [expr {1 == $x ? 1 : $x * [fact [expr {$x - 1}]]}]
+  return [expr {0 == $x ? 1 : $x * [fact [expr {$x - 1}]]}]
 }
 
 # -------------------------------------------------------------------
@@ -1156,7 +1112,7 @@ proc fact {x} {
 #GRPH
 #IEV
 #LCSM
-#LIA ?
+LIA
 #PRTM
 #MRNA
 #PERM
@@ -1165,7 +1121,7 @@ proc fact {x} {
 #SPLC
 #PROB
 #TRAN
-SIGN
+#SIGN
 
 # -------------------------------------------------------------------
 
