@@ -578,11 +578,12 @@ proc LIA {} {
   set n 1
 
   # Number of organisms in generation
-  set org [expr {$k ** 2}]
+  set org [expr {2 ** $k}]
 
   # P(Aa) * P(Bb)
   set prob [expr {0.5 ** 2}]
 
+  # Cumulative probability
   set sum 0
   for {set i $n} {$i <= $org} {incr i} {
     set sum [expr {$sum + ([fact $org] / ([fact $i] * ([fact [expr $org - $i]]))) *\
