@@ -1,0 +1,56 @@
+
+$include "functions.icn"
+
+# Test
+
+procedure KMP()
+end
+
+procedure LGIS()
+
+  f := open("lgis.txt","r")
+  len := lineToInts(read(f))[1]
+  arr := lineToInts(read(f))
+  close(f)
+
+  # Save indices
+  tb := table()
+  every i := 1 to *arr do
+    tb[arr[i]] := i
+
+  sequences := []
+  every i := 1 to *arr do {
+    currentIndex := i
+    sequence := []
+    while 0 ~= currentIndex do {
+      put(sequence,arr[currentIndex])
+      rest := arr[currentIndex+1:0]
+      currentIndex := smallest(rest,arr[currentIndex],tb) | 0
+    }
+    push(sequences,sequence)
+  }
+
+  every sq := !sequences do {
+    every writes(!sq," ")
+    write()
+  }
+
+end
+
+procedure smallest(lst,n,tb)
+
+  lst := sort(lst)
+  every e := !lst do {
+    if e > n & tb[n] < tb[e] then
+      return tb[e]
+  }
+
+  fail
+
+end
+
+
+procedure main()
+  LGIS()
+  KMP()
+end

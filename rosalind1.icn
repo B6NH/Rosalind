@@ -1,4 +1,6 @@
 
+$include "functions.icn"
+
 # -------------------------------------------------------------------
 
 procedure FIBO()
@@ -66,18 +68,6 @@ procedure binS(el, lst, maxI)
     return -1
 
   }
-
-end
-
-procedure lineToInts(line)
-
-  ints := [] ; s := &digits ++ '-'
-
-  line ?
-    while tab(upto(s)) do
-      put(ints,integer(tab(many(s))))
-
-  return ints
 
 end
 
@@ -461,51 +451,6 @@ procedure revComp(str,t)
   every i := 1 to *str do
     str[i] := t[str[i]]
   return str
-end
-
-# -------------------------------------------------------------------
-
-procedure LGIS()
-
-  f := open("lgis.txt","r")
-  len := lineToInts(read(f))[1]
-  arr := lineToInts(read(f))
-  close(f)
-
-  # Save indices
-  tb := table()
-  every i := 1 to *arr do
-    tb[arr[i]] := i
-
-  sequences := []
-  every i := 1 to *arr do {
-    currentIndex := i
-    sequence := []
-    while 0 ~= currentIndex do {
-      put(sequence,arr[currentIndex])
-      rest := arr[currentIndex+1:0]
-      currentIndex := smallest(rest,arr[currentIndex],tb) | 0
-    }
-    push(sequences,sequence)
-  }
-
-  every sq := !sequences do {
-    every writes(!sq," ")
-    write()
-  }
-
-end
-
-procedure smallest(lst,n,tb)
-
-  lst := sort(lst)
-  every e := !lst do {
-    if e > n & tb[n] < tb[e] then
-      return tb[e]
-  }
-
-  fail
-
 end
 
 # -------------------------------------------------------------------
@@ -1055,11 +1000,6 @@ end
 
 # -------------------------------------------------------------------
 
-procedure KMP()
-end
-
-# -------------------------------------------------------------------
-
 procedure ASPC()
 
   n := 6 ; m := 3
@@ -1321,7 +1261,6 @@ procedure main()
   #PPER()
   #LEXF()
   #REVP()
-  #LGIS() ?
   #SSEQ()
   #PMCH()
   #PAR()
@@ -1335,11 +1274,10 @@ procedure main()
   #LONG()
   #CORR()
   #KMER()
-  #KMP() ?
   #ASPC()
   #SETO()
-  NWCK()
-  #TRIE()
+  #NWCK()
+  TRIE()
 
 end
 

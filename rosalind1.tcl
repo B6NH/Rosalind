@@ -1113,7 +1113,7 @@ proc fact {x} {
 #GRPH
 #IEV
 #LCSM
-LIA
+#LIA
 #PRTM
 #MRNA
 #PERM
@@ -1122,7 +1122,7 @@ LIA
 #SPLC
 #PROB
 #TRAN
-#SIGN
+SIGN
 
 # -------------------------------------------------------------------
 

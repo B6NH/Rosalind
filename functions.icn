@@ -1,0 +1,14 @@
+
+# Functions
+
+procedure lineToInts(line)
+
+  ints := [] ; s := &digits ++ '-'
+
+  line ?
+    while tab(upto(s)) do
+      put(ints,integer(tab(many(s))))
+
+  return ints
+
+end

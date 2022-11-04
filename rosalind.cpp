@@ -4,6 +4,8 @@
 #include <map>
 #include <vector>
 
+// I used C++ because other languages were too slow
+
 using namespace std;
 
 void SUM3() {
