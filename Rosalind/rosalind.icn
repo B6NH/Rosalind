@@ -1,6 +1,4 @@
 
-$include "functions.icn"
-
 # -------------------------------------------------------------------
 
 procedure FIBO()
@@ -68,6 +66,18 @@ procedure binS(el, lst, maxI)
     return -1
 
   }
+
+end
+
+procedure lineToInts(line)
+
+  ints := [] ; s := &digits ++ '-'
+
+  line ?
+    while tab(upto(s)) do
+      put(ints,integer(tab(many(s))))
+
+  return ints
 
 end
 
@@ -1246,6 +1256,117 @@ end
 
 # -------------------------------------------------------------------
 
+procedure BIP()
+
+  # Open file
+  f := open("bip.txt","r")
+
+  # Read number of graphs
+  nGraphs := read(f)
+
+  # Skip empty line
+  read(f)
+
+  # Read graphs
+  every i := 1 to nGraphs do {
+
+    # First line in graph is number of nodes and edges
+    nodesEdges := read(f)
+
+    # Read number of nodes and edges
+    nodesEdges ? {
+      nodes := integer(tab(many(&digits)))
+      tab(upto(&digits))
+      edges := integer(tab(many(&digits)))
+    }
+
+    # Create list with node colors (-1/1)
+    colors := list(nodes,0)
+
+    # Initialize connection list
+    con := list(nodes,[])
+    every con[1 to nodes] := []
+
+    # Read edges
+    while (line := read(f)) ~== "" do {
+
+      line ? {
+        nodeA := integer(tab(many(&digits)))
+        tab(upto(&digits))
+        nodeB := integer(tab(many(&digits)))
+      }
+
+      # Add links
+      push(con[nodeA],nodeB)
+      push(con[nodeB],nodeA)
+
+    }
+
+    # Repeat as long as there are empty nodes
+    result := 1
+    while 0 ~= (toC := blankNode(colors)) do {
+
+      # Break if wrong color was found
+      if not(colorGraph([toC],-1,colors,con)) then {
+        result := -1 ; break
+      }
+
+    }
+
+    # Display result for current graph
+    writes(result," ")
+
+  }
+
+  # Close file
+  close(f)
+
+  write()
+
+end
+
+procedure colorGraph(nodes,color,colors,con)
+
+  # Color all nodes from list
+  every n := !nodes do {
+
+    # Wrong color - not bipartite graph
+    if colors[n] = -color then
+      fail
+
+    # Unvisited node
+    else if 0 = colors[n] then {
+
+      # Mark this node with current color
+      colors[n] := color
+
+      # Color all connected nodes with other color
+      if not(colorGraph(con[n],-color,colors,con)) then fail
+
+    }
+
+    # Otherwise skip this node...
+
+  }
+
+  # Success
+  return
+
+end
+
+procedure blankNode(colors)
+
+  # Find first blank node
+  every i := 1 to *colors do
+    if 0 = colors[i] then return i
+
+  # All nodes are colored
+  return 0
+
+end
+
+# -------------------------------------------------------------------
+
 procedure main()
 
   #FIBO()
@@ -1277,7 +1398,8 @@ procedure main()
   #ASPC()
   #SETO()
   #NWCK()
-  TRIE()
+  #TRIE()
+  BIP()
 
 end
 
